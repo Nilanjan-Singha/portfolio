@@ -354,7 +354,8 @@ var PH=D.photos.map(function(p){return [esc(okurl(p.src)),esc(p.alt||'')]}).filt
 (function(){var P=D.profile,A=D.about,W=D.work,g=function(i){return document.getElementById(i)};
 document.title=P.name+' — '+P.role;
 if(P.cover)g('coverimg').src=P.cover;
-var av=g('pav');av.setAttribute('aria-label',P.name);if(P.avatar)av.innerHTML='<img src="'+P.avatar+'" alt="">';else av.textContent=P.initial||P.name.charAt(0);
+var av=g('pav'),avSrc=P.avatar;av.setAttribute('aria-label',P.name);
+if(avSrc)av.innerHTML='<img src="'+avSrc+'" alt="">';else av.textContent=P.initial||P.name.charAt(0);
 g('pname').textContent=P.name;
 g('pstats').innerHTML=P.stats.map(function(x){return '<li><b>'+esc(x.n)+'</b> '+esc(x.l)+'</li>'}).join('');
 g('pbio').innerHTML='<strong>'+esc(P.role)+'</strong>'+esc(P.bio);

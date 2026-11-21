@@ -328,7 +328,9 @@ function applyCms(D) {
 
   document.title = P.name + " — " + P.role;
   document.getElementById("pname").textContent = P.name;
-  document.getElementById("pfp").src = P.avatar || "./pfp.jpg";
+  document.getElementById("pfp").src = P.avatar
+    ? (P.avatar === "./pfp.jpg" ? "./main/pfp.jpg" : P.avatar)
+    : "./main/pfp.jpg";
   document.getElementById("pfp").alt = P.name;
   var cover = document.querySelector("#cover-wrap img");
   if (cover && P.cover) cover.src = P.cover;
@@ -414,7 +416,7 @@ function applyCms(D) {
   route();
 }
 
-fetch("./d0.json")
+fetch("./cms/d0.json")
   .then(function (r) { return r.ok ? r.json() : null; })
   .then(function (defaults) {
     var D = defaults;

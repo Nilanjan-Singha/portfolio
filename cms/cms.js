@@ -1,10 +1,11 @@
 
 var TPL='',KEY='portfolio-cms-v1',D0=null,D=null,cur=0,tm,DL=null,$=function(i){return document.getElementById(i)};
+var CMS_BASE=location.pathname.endsWith('/cms/cms.html')?'./':'./cms/';
 function clone(x){return JSON.parse(JSON.stringify(x))}
 function el(t,c,h){var e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e}
 var READY=Promise.all([
- fetch('./d0.json').then(function(r){if(!r.ok)throw new Error('Could not load default content');return r.json()}),
- fetch('./preview-template.html').then(function(r){if(!r.ok)throw new Error('Could not load preview template');return r.text()})
+ fetch(CMS_BASE+'d0.json').then(function(r){if(!r.ok)throw new Error('Could not load default content');return r.json()}),
+ fetch(CMS_BASE+'preview-template.html').then(function(r){if(!r.ok)throw new Error('Could not load preview template');return r.text()})
 ]).then(function(parts){
  D0=parts[0];TPL=parts[1].split('<\\/script').join('</script');
  try{D=JSON.parse(localStorage.getItem(KEY))}catch(e){}
@@ -44,7 +45,15 @@ var SC=[
 ];
 
 function stat(m){var s=$('stat');if(s)s.textContent=m}
-function build(){return READY.then(function(){return TPL.split('__DATA__').join(JSON.stringify(D).replace(/</g,'\\u003c'))})}
+function build(){return READY.then(function(){
+ var preview=clone(D);
+ if(preview.profile&&preview.profile.avatar){
+  preview.profile.avatar=preview.profile.avatar==='./pfp.jpg'
+   ?(CMS_BASE==='./'?'../main/pfp.jpg':'./main/pfp.jpg')
+   :preview.profile.avatar;
+ }
+ return TPL.split('__DATA__').join(JSON.stringify(preview).replace(/</g,'\\u003c'));
+})}
 function prev(){build().then(function(h){$('pvf').srcdoc=h;if(!$('modal').hidden)$('pvf2').srcdoc=h})}
 function chg(){stat('Saving…');clearTimeout(tm);tm=setTimeout(function(){try{localStorage.setItem(KEY,JSON.stringify(D));stat('Saved')}catch(e){stat('Not saved in this browser')}nav();prev()},350)}
 

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Site content - Portfolio CMS</title>
+<link rel="stylesheet" href="./cms/cms.css">
+</head>
+<body>
+<div class="app">
+ <aside class="side">
+  <div class="brand"><b>Site content</b><small>Edit everything on your portfolio</small></div>
+  <nav id="nav" aria-label="Sections"></nav>
+  <div class="pv">
+   <div class="pvh"><span>Live preview</span><button class="b2" id="open" type="button">Open full</button></div>
+   <div class="pvbox" id="pvbox"><iframe id="pvf" title="Portfolio preview" sandbox="allow-scripts" tabindex="-1"></iframe></div>
+  </div>
+  <div class="acts">
+   <button class="b2 p" id="dlh" type="button">Download site (.html)</button>
+   <button class="b2" id="dlj" type="button">Export content (.json)</button>
+   <button class="b2" id="imp" type="button">Import content</button>
+   <button class="b2" id="rst" type="button">Reset to defaults</button>
+   <input type="file" id="impf" accept=".json,application/json" hidden>
+   <p class="note">Edits save in this browser. Download the site to publish your changes.</p>
+  </div>
+ </aside>
+ <main id="main"></main>
+</div>
+<div class="modal" id="modal" hidden>
+ <div class="mb"><b>Full preview</b><button class="b2" id="dsk" type="button">Desktop</button><button class="b2" id="mob" type="button">Mobile</button><button class="b2" id="cls" type="button">Close</button></div>
+ <div class="mfw"><iframe id="pvf2" title="Full portfolio preview" sandbox="allow-scripts"></iframe></div>
+</div>
+<script src="./cms/cms.js"></script>
+</body>
+</html>

@@ -36,8 +36,8 @@ var SC=[
 {l:'Lists',d:'Shelves for reading, watching and gaming. Each item becomes a book spine. Add a cover image, or leave it empty for an automatic soft color.',c:function(){return D.lists.length},o:function(){return D},f:[
  {k:'lists',l:'Shelves',t:'list',sum:'name',a:'Add shelf',n:{name:'New shelf',items:[]},f:[{k:'name',l:'Shelf name'},
   {k:'items',l:'Items (ranked in order)',t:'list',inline:1,a:'Add item',n:{t:'',s:'',status:'Want to',img:''},f:[{k:'t',l:'Title'},{k:'s',l:'Author or studio'},{k:'status',l:'Status',t:'select',half:1,options:['Want to','In progress','Completed','Paused']},{k:'img',l:'Cover image',t:'img',w:420,wide:1}]}]}]},
-{l:'Writing',d:'Blog posts. Separate paragraphs with a blank line and start a line with ## for a heading. The first paragraph becomes the lead.',c:function(){return D.posts.length},o:function(){return D},f:[
- {k:'posts',l:'Posts',t:'list',sum:'t',top:1,a:'New post',n:function(){return {t:'Untitled post',d:new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}),tags:'',x:'',body:''}},f:[{k:'t',l:'Title'},{k:'d',l:'Date',half:1},{k:'tags',l:'Tags (comma separated)',half:1},{k:'x',l:'Excerpt',t:'area',r:2},{k:'body',l:'Article',t:'area',r:12}]}]},
+{l:'Writing',d:'Blog posts with a block-based Editor.js workspace.',c:function(){return D.posts.length},o:function(){return D},f:[
+ {k:'posts',l:'Posts',t:'list',sum:'t',top:1,editor:1,a:'New post',n:function(){return {t:'Untitled post',d:new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}),tags:'',x:'',body:'',bodyData:null}},f:[{k:'t',l:'Title'},{k:'d',l:'Date',half:1},{k:'tags',l:'Tags (comma separated)',half:1},{k:'x',l:'Excerpt',t:'area',r:2},{k:'edit',l:'Editor',t:'editor'}]}]},
 {l:'Projects',d:'Project cards. Add an image and URL, or leave them empty for an automatic card.',c:function(){return D.projects.length},o:function(){return D},f:[
  {k:'projects',l:'Projects',t:'list',sum:'t',a:'Add project',n:{t:'New project',x:'',url:'',img:''},f:[{k:'t',l:'Name'},{k:'x',l:'Description',t:'area',r:2},{k:'url',l:'Project URL',half:1},{k:'img',l:'Project image',t:'img',w:1000}]}]},
 {l:'Photography',d:'Your gallery. Upload photos or paste image links. With no photos, the site shows an empty-gallery message.',c:function(){return D.photos.length},o:function(){return D},f:[
@@ -66,6 +66,13 @@ function ctl(arr,n,draw){var w=el('span','ctl');[['↑','Move up'],['↓','Move 
 function fields(fs,o,inl){var w=el('div','fields'+(inl?' inl':''));fs.forEach(function(f){w.appendChild(fld(f,o))});return w}
 function fld(f,o){var t=f.t||'text';
  if(t==='list')return lst(f,o[f.k]);if(t==='strings')return strs(f,o[f.k]);if(t==='img')return img(f,o);
+ if(t==='editor'){
+  var index=D.posts.indexOf(o),link=el('a','b2','Open block editor');
+  link.href=CMS_BASE+'writing/edit/?id='+Math.max(0,index);
+  link.onclick=function(){try{localStorage.setItem(KEY,JSON.stringify(D))}catch(e){}};
+  var wrap=el('div','f full','<span class="l">'+f.l+'</span>');
+  wrap.appendChild(link);return wrap;
+ }
  var w=el('label','f'+(f.half?'':' full')),i=el(t==='area'?'textarea':t==='select'?'select':'input');w.appendChild(el('span','l',f.l));
  if(t==='area')i.rows=f.r||3;
  else if(t==='select'){(f.options||[]).forEach(function(option){var selected=el('option','',option);selected.value=option;i.appendChild(selected)})}
@@ -81,7 +88,9 @@ function lst(f,arr){var box=el('div','lst'),lh=el('div','lh','<span class="l">'+
    s.appendChild(el('span','car','▸'));s.appendChild(st);s.appendChild(ctl(arr,n,draw));r.appendChild(s);r.appendChild(b);
    b.addEventListener('input',function(){st.textContent=it[f.sum]||'Untitled'});if(n===open)r.open=true}
   items.appendChild(r)});cnt.textContent=arr.length}
- add.onclick=function(){var x=typeof f.n==='function'?f.n():clone(f.n);if(f.top)arr.unshift(x);else arr.push(x);chg();draw(f.top?0:arr.length-1)};
+ add.onclick=function(){var x=typeof f.n==='function'?f.n():clone(f.n);if(f.top)arr.unshift(x);else arr.push(x);chg();
+  if(f.editor){try{localStorage.setItem(KEY,JSON.stringify(D))}catch(e){};location.href=CMS_BASE+'writing/edit/?id='+ (f.top?0:arr.length-1);return}
+  draw(f.top?0:arr.length-1)};
  draw();box.appendChild(lh);box.appendChild(items);box.appendChild(add);return box}
 
 function strs(f,arr){var box=el('div','lst'),lh=el('div','lh','<span class="l">'+f.l+'</span>'),items=el('div','strs'),add=el('button','add','+ '+(f.a||'Add'));add.type='button';

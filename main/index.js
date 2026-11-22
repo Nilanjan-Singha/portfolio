@@ -30,13 +30,103 @@ function slug(t) {
 }
 
 function cmsPost(p) {
+  function sanitizeInlineHtml(value) {
+    var template = document.createElement("template");
+    template.innerHTML = String(value == null ? "" : value);
+    template.content.querySelectorAll("*").forEach(function (element) {
+      var allowed = ["A", "MARK", "U", "S", "STRIKE", "CODE", "B", "STRONG", "I", "EM"];
+      if (allowed.indexOf(element.tagName) === -1) {
+        element.replaceWith(document.createTextNode(element.textContent));
+        return;
+      }
+      Array.prototype.forEach.call(element.attributes, function (attribute) {
+        if (element.tagName === "A" && attribute.name === "href") return;
+        if (["target", "rel"].indexOf(attribute.name) !== -1 && element.tagName === "A") return;
+        element.removeAttribute(attribute.name);
+      });
+      if (element.tagName === "A") {
+        var href = element.getAttribute("href") || "";
+        if (!/^https?:\/\//i.test(href) && !/^mailto:/i.test(href)) element.removeAttribute("href");
+        element.target = "_blank";
+        element.rel = "noopener noreferrer";
+      }
+    });
+    return template.innerHTML;
+  }
+  function escapeHtml(value) {
+    return esc(value == null ? "" : value);
+  }
+  function nestedList(items, ordered) {
+    return (items || []).map(function (item) {
+      var text = typeof item === "string" ? item : item.content || "";
+      var children = typeof item === "object" && item.items ? nestedList(item.items, ordered) : "";
+      return "<li>" + escapeHtml(text) + children + "</li>";
+    }).join("");
+  }
+  function blocksToHtml(data) {
+    if (!data || !Array.isArray(data.blocks)) return "";
+    return data.blocks.map(function (block) {
+      var d = block.data || {};
+      if (block.type === "header") {
+        var level = Math.min(6, Math.max(1, Number(d.level) || 2));
+        return "<h" + level + ">" + sanitizeInlineHtml(d.text) + "</h" + level + ">";
+      }
+      if (block.type === "paragraph") return "<p>" + sanitizeInlineHtml(d.text) + "</p>";
+      if (block.type === "quote") return "<blockquote>" + sanitizeInlineHtml(d.text) + (d.caption ? "<cite>" + escapeHtml(d.caption) + "</cite>" : "") + "</blockquote>";
+      if (block.type === "list" || block.type === "nestedlist") {
+        var ordered = d.style === "ordered";
+        var tag = ordered ? "ol" : "ul";
+        return "<" + tag + ">" + nestedList(d.items, ordered) + "</" + tag + ">";
+      }
+      if (block.type === "checklist") {
+        return '<ul class="checklist">' + (d.items || []).map(function (item) {
+          return "<li>" + (item.checked ? "☑" : "☐") + " " + escapeHtml(item.text) + "</li>";
+        }).join("") + "</ul>";
+      }
+      if (block.type === "code") return "<pre><code>" + escapeHtml(d.code) + "</code></pre>";
+      if (block.type === "table") {
+        return "<table>" + (d.content || []).map(function (row, index) {
+          var tag = index === 0 && d.withHeadings ? "th" : "td";
+          return "<tr>" + row.map(function (cell) { return "<" + tag + ">" + sanitizeInlineHtml(cell) + "</" + tag + ">"; }).join("") + "</tr>";
+        }).join("") + "</table>";
+      }
+      if (block.type === "linkTool") {
+        var linkMeta = d.meta || {};
+        var linkUrl = d.link || d.url || "";
+        return linkUrl ? '<a class="editor-link-preview" href="' + escapeHtml(linkUrl) + '" target="_blank" rel="noopener noreferrer"><strong>' + escapeHtml(linkMeta.title || d.title || linkUrl) + "</strong><span>" + escapeHtml(linkMeta.description || d.description || linkUrl) + "</span></a>" : "";
+      }
+      if (block.type === "image" || block.type === "inlineImage" || block.type === "simpleImage") {
+        var imageUrl = d.file && d.file.url ? d.file.url : d.url || "";
+        return imageUrl ? '<figure><img src="' + escapeHtml(imageUrl) + '" alt="' + escapeHtml(d.caption) + '"><figcaption>' + escapeHtml(d.caption) + "</figcaption></figure>" : "";
+      }
+      if (block.type === "gallery" || block.type === "carousel") {
+        return '<div class="' + block.type + '">' + (d.items || []).map(function (item) {
+          var url = typeof item === "string" ? item : item.url || "";
+          return url ? '<img src="' + escapeHtml(url) + '" alt="">' : "";
+        }).join("") + "</div>";
+      }
+      if (block.type === "embed") return d.embed ? '<iframe src="' + escapeHtml(d.embed) + '" title="' + escapeHtml(d.caption) + '" loading="lazy"></iframe>' : "";
+      if (block.type === "attaches") {
+        var attachmentUrl = d.file && d.file.url ? d.file.url : d.dataUrl || "";
+        return attachmentUrl ? '<a href="' + escapeHtml(attachmentUrl) + '" download="' + escapeHtml(d.name || d.file && d.file.name || "attachment") + '">' + escapeHtml(d.name || d.file && d.file.name || "Download attachment") + "</a>" : "";
+      }
+      if (block.type === "button") return d.url ? '<a class="btn" href="' + escapeHtml(d.url) + '">' + escapeHtml(d.text || "Open") + "</a>" : "";
+      if (block.type === "layout") return '<div class="editor-layout"><div>' + escapeHtml(d.left) + "</div><div>" + escapeHtml(d.right) + "</div></div>";
+      if (block.type === "collapsible") return "<details><summary>" + escapeHtml(d.title || "Details") + "</summary><p>" + escapeHtml(d.text) + "</p></details>";
+      if (block.type === "drawing" || block.type === "gif") {
+        var mediaUrl = d.dataUrl || d.url || "";
+        return mediaUrl ? '<img src="' + escapeHtml(mediaUrl) + '" alt="' + escapeHtml(d.caption || block.type) + '">' : "";
+      }
+      return d.text ? "<p>" + escapeHtml(d.text) + "</p>" : "";
+    }).join("");
+  }
   return {
     id: slug(p.t),
     d: p.d,
     tags: String(p.tags || "").split(",").map(function (t) { return t.trim(); }).filter(Boolean),
     t: p.t,
     x: p.x,
-    body: [String(p.body || "").split(/\n\s*\n/).filter(Boolean).map(function (b) {
+    body: p.bodyData ? [blocksToHtml(p.bodyData)] : [String(p.body || "").split(/\n\s*\n/).filter(Boolean).map(function (b) {
       b = b.trim();
       return b.slice(0, 3) === "## "
         ? "<h2>" + esc(b.slice(3)) + "</h2>"

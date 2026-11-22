@@ -369,6 +369,56 @@ main {
   font-size: 15px;
   max-width: 40em;
 }
+.article .editor-layout,
+.article .carousel,
+.article .gallery {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin: 24px 0;
+}
+.article .gallery,
+.article .carousel {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+.article .editor-layout > div {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 18px;
+}
+.article .gallery img,
+.article .carousel img,
+.article figure img,
+.article > img {
+  width: 100%;
+  border-radius: 10px;
+  object-fit: cover;
+}
+.article table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+}
+.article table td,
+.article table th {
+  border: 1px solid var(--line);
+  padding: 10px 12px;
+  text-align: left;
+}
+.article .editor-link-preview {
+  display: grid;
+  gap: 4px;
+  margin: 20px 0;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 14px 16px;
+  background: var(--surface);
+  text-decoration: none;
+}
+.article .editor-link-preview span {
+  color: var(--soft);
+  font-size: 13px;
+}
 .btn {
   border: 0;
   border-radius: 6px;

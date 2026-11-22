@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Edit post - Portfolio CMS</title>
+  <link rel="stylesheet" href="../../../cms/cms.css">
+  <link rel="stylesheet" href="./editor.css">
+</head>
+<body class="editor-page">
+  <header class="editor-topbar">
+    <a class="editor-back" id="back-link" href="../../cms.html">← Back to CMS</a>
+    <div class="editor-actions">
+      <span class="editor-save-status" id="save-status">Saved locally</span>
+      <button class="b2" id="undo-button" type="button">Undo</button>
+      <button class="b2" id="redo-button" type="button">Redo</button>
+      <button class="b2 p" id="save-button" type="button">Save post</button>
+    </div>
+  </header>
+
+  <main class="editor-shell">
+    <aside class="editor-meta">
+      <div class="editor-meta-head">
+        <strong>Post details</strong>
+        <button class="editor-collapse-button" id="collapse-details" type="button" aria-expanded="true" aria-controls="editor-meta-fields" aria-label="Collapse post details">‹</button>
+      </div>
+      <div class="editor-meta-fields" id="editor-meta-fields">
+      <label>
+        <span>Post title</span>
+        <input id="post-title" type="text" value="Untitled post">
+      </label>
+      <label>
+        <span>Date</span>
+        <input id="post-date" type="text">
+      </label>
+      <label>
+        <span>Tags</span>
+        <input id="post-tags" type="text" placeholder="design, tools">
+      </label>
+      <label>
+        <span>Excerpt</span>
+        <textarea id="post-excerpt" rows="5"></textarea>
+      </label>
+      <button class="b2 preview-meta-button" id="preview-button" type="button">Preview post</button>
+      </div>
+    </aside>
+
+    <section class="editor-canvas">
+      <div class="editor-document">
+        <h1 id="editor-document-title">Untitled post</h1>
+        <div id="editorjs"></div>
+      </div>
+    </section>
+  </main>
+
+  <div class="editor-preview-modal" id="preview-modal" hidden>
+    <header class="editor-preview-bar">
+      <strong>Post preview</strong>
+      <button class="b2" id="close-preview-button" type="button">Close</button>
+    </header>
+    <div class="editor-preview-scroll">
+      <article class="editor-preview-document" id="preview-document"></article>
+    </div>
+  </div>
+
+  <script type="module" src="./editor.js"></script>
+</body>
+</html>

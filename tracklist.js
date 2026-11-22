@@ -36,7 +36,7 @@ function normalizeLists(data) {
 }
 
 function load() {
-  return fetch("./cms/d0.json")
+  return fetch("./cms/d0.json?tracklist=" + Date.now(), { cache: "no-store" })
     .then(function (response) { return response.ok ? response.json() : null; })
     .then(function (defaults) {
       var data = defaults;
@@ -162,3 +162,11 @@ function render() {
 }
 
 load();
+
+window.addEventListener("storage", function (event) {
+  if (event.key === "portfolio-cms-v1") load();
+});
+
+window.addEventListener("pageshow", function () {
+  load();
+});

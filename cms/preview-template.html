@@ -128,11 +128,10 @@ a.btn{display:inline-block}
 .ltabs button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 .lview{overflow:hidden}
 .ltrack{display:flex;transition:transform .35s ease}
+.list-footer{display:flex;justify-content:center;margin-top:8px}
 .slide{flex:0 0 100%;min-width:0}
 .row{--h:clamp(300px,42vw,380px);display:flex;gap:6px;align-items:flex-start;overflow-x:auto;padding:22px 0 30px}
 .sp{flex:none;position:relative;height:var(--h);border-radius:3px 3px 2px 2px;writing-mode:vertical-rl;display:flex;align-items:center;gap:16px;padding-block-start:28px;background-color:var(--c);background-image:linear-gradient(90deg,rgba(0,0,0,.3),rgba(255,255,255,.16) 30%,rgba(255,255,255,0) 55%,rgba(0,0,0,.22));transition:transform .35s cubic-bezier(.3,1.5,.5,1),box-shadow .3s}
-.sp::before,.sp::after{content:"";position:absolute;left:0;right:0;border-top:1px solid currentColor;opacity:.35}
-.sp::before{top:12px}.sp::after{bottom:12px}
 .row>.sp:first-child{margin-left:auto}.row>.sp:last-child{margin-right:auto}
 .ltabs{justify-content:center}
 .sp:hover{transform:translateY(-14px);box-shadow:0 16px 20px rgba(0,0,0,.35)}
@@ -222,7 +221,6 @@ footer small{color:var(--mute);font-size:12.5px}
    <div>
     <div class="prow">
      <h1 id="pname"></h1>
-     <a class="btn ghost" id="hello" href="#">Say hello</a>
     </div>
     <ul class="stats" id="pstats"></ul>
     <p class="bio" id="pbio"></p>
@@ -262,6 +260,7 @@ footer small{color:var(--mute);font-size:12.5px}
   <h2 class="sh">Lists</h2>
   <div class="ltabs" role="tablist" aria-label="Lists"></div>
   <div class="lview"><div class="ltrack" id="ltrack"></div></div>
+  <div class="list-footer"><a class="btn ghost" href="./tracklist.html">View all</a></div>
  </section>
 
  <section class="view" id="v-writing">
@@ -315,7 +314,7 @@ var POSTS=D.posts.map(function(p){return {id:slug(p.t),d:esc(p.d),tags:String(p.
 function soft(t){var h=0,s=String(t||'x');for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))%360;return ['hsl('+h+' 45% 84%)','hsl('+((h+30)%360)+' 40% 68%)','hsl('+h+' 45% 16%)']}
 function okurl(u){u=String(u||'').trim();return /^(data:image\/|https?:\/\/)/i.test(u)?u:''}
 function bgify(){[].forEach.call(document.querySelectorAll('[data-im]'),function(e){var u=e.getAttribute('data-im');if(!u){e.classList.remove('im');return}e.style.setProperty('--im','url("'+u.replace(/"/g,'%22').replace(/\\/g,'%5C')+'")');var t=new Image();t.onerror=function(){e.classList.remove('im')};t.src=u})}
-var PROJECTS=D.projects.map(function(p){var c=soft(p.t);return [esc(p.t),esc(p.x),'linear-gradient(135deg,'+(p.c1||c[0])+','+(p.c2||c[1])+')',esc(okurl(p.img))]});
+var PROJECTS=D.projects.map(function(p){var c=soft(p.t);return [esc(p.t),esc(p.x),'linear-gradient(135deg,'+(p.c1||c[0])+','+(p.c2||c[1])+')',esc(okurl(p.img)),esc(/^https?:\/\//i.test(p.url||'')?p.url:'')]});
 var PH=D.photos.map(function(p){return [esc(okurl(p.src)),esc(p.alt||'')]}).filter(function(p){return p[0]});
 (function(){var P=D.profile,A=D.about,W=D.work,g=function(i){return document.getElementById(i)};
 document.title=P.name+' — '+P.role;
@@ -326,7 +325,7 @@ g('pname').textContent=P.name;
 g('pstats').innerHTML=P.stats.map(function(x){return '<li><b>'+esc(x.n)+'</b> '+esc(x.l)+'</li>'}).join('');
 g('pbio').innerHTML='<strong>'+esc(P.role)+'</strong>'+esc(P.bio);
 g('fname').textContent=P.name;g('frole').textContent=P.role;g('fcopy').textContent='© '+new Date().getFullYear()+' '+P.name;
-g('hello').href='mailto:'+W.email;g('resume').href='mailto:'+W.email+'?subject=Resume%20request';
+g('resume').href='mailto:'+W.email+'?subject=Resume%20request';
 g('aboutp').innerHTML=A.paras.map(function(x){return '<p>'+esc(x)+'</p>'}).join('');
 g('facts').innerHTML=A.facts.map(function(f){return '<div><span>'+esc(f.k)+'</span>'+esc(f.v)+'</div>'}).join('');
 g('jobs').innerHTML=W.jobs.map(function(j){return '<li><span class="yr">'+esc(j.yr)+'</span><div><h3>'+esc(j.role)+'</h3><p class="co">'+esc(j.co)+'</p><p>'+esc(j.desc)+'</p></div></li>'}).join('');
@@ -342,7 +341,7 @@ skillIcons('skills-ai',SK.ai);
 skillIcons('skills-tools',SK.tools);
 })();
 
-document.getElementById('projects').innerHTML=PROJECTS.map(function(p){return '<a class="proj" href="#projects">'+(p[3]?'<div class="thumb im"><img src="'+p[3]+'" alt=""></div>':'<div class="thumb" style="--g:'+p[2]+'"></div>')+'<h2>'+p[0]+'</h2><p>'+p[1]+'</p></a>'}).join('');
+document.getElementById('projects').innerHTML=PROJECTS.map(function(p){var u=p[4]||'#projects',ext=u==='#projects'?'':' target="_blank" rel="noopener noreferrer"';return '<a class="proj" href="'+u+'"'+ext+'>'+ (p[3]?'<div class="thumb im"><img src="'+p[3]+'" alt=""></div>':'<div class="thumb" style="--g:'+p[2]+'"></div>')+'<h2>'+p[0]+'</h2><p>'+p[1]+'</p></a>'}).join('');
 var pe=document.getElementById('photos');
 pe.innerHTML=PH.length?PH.map(function(p){return '<img src="'+p[0]+'" alt="'+p[1]+'" loading="lazy">'}).join(''):'<p class="empty"><b>No photos in your gallery yet</b>Photos you add will show up here.</p>';
 [].forEach.call(pe.querySelectorAll('img'),function(i){i.onerror=function(){var d=document.createElement('div');d.className='ph';d.style.background=soft(i.alt||i.src.slice(-12))[0];i.replaceWith(d)}});
@@ -352,6 +351,8 @@ document.getElementById('list').innerHTML=POSTS.map(function(p){return '<article
 function showPost(p){
   document.getElementById('article').innerHTML='<a class="back" href="#writing">← Back to writing</a><div class="cover" role="img" aria-label="Wireframe sketches"></div>'+meta(p)+'<h1>'+p.t+'</h1>'+p.body.join('')+'<div class="share"><span>Share this article</span><div><button aria-label="Copy link">'+ic('link')+'</button><button aria-label="Share on Twitter">'+ic('twitter')+'</button><button aria-label="Share on Dribbble">'+ic('dribbble')+'</button><button aria-label="Share on LinkedIn">'+ic('linkedin')+'</button></div></div>';
 }
+var tracklistLink=document.querySelector('.list-footer a');
+if(tracklistLink&&location.pathname.endsWith('/cms/cms.html'))tracklistLink.href='../tracklist.html';
 function route(){
   var h=(location.hash||'').slice(1),post=POSTS.filter(function(p){return p.id===h})[0],on=post?['post']:['about','work','skills','lists','writing','projects','photography'];
   if(post)showPost(post);

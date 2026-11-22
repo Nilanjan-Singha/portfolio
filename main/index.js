@@ -342,7 +342,6 @@ function applyCms(D) {
   document.getElementById("fname").textContent = P.name;
   document.getElementById("frole").textContent = P.role;
   document.getElementById("fcopy").textContent = "© " + new Date().getFullYear() + " " + P.name;
-  document.getElementById("hello").href = "mailto:" + W.email;
   document.getElementById("resume").href = "mailto:" + W.email + "?subject=Resume%20request";
 
   document.getElementById("aboutp").innerHTML = A.paras
@@ -384,13 +383,15 @@ function applyCms(D) {
   iconGroup("skills-tools", SK.tools);
 
   PROJECTS = D.projects.map(function (p) {
-    return [p.t, p.x, "linear-gradient(135deg," + (p.c1 || "#dfe8cf") + "," + (p.c2 || "#8fae5c") + ")", p.img || ""];
+    return [p.t, p.x, "linear-gradient(135deg," + (p.c1 || "#dfe8cf") + "," + (p.c2 || "#8fae5c") + ")", p.img || "", p.url || ""];
   });
   document.getElementById("projects").innerHTML = PROJECTS.map(function (p) {
     var thumb = p[3]
       ? '<div class="thumb im"><img src="' + p[3].replace(/&/g, "&amp;").replace(/"/g, "&quot;") + '" alt=""></div>'
       : '<div class="thumb" style="background:' + p[2] + '"></div>';
-    return '<a class="proj" href="#projects">' + thumb + "<h2>" + esc(p[0]) + "</h2><p>" + esc(p[1]) + "</p></a>";
+    var url = /^https?:\/\//i.test(p[4] || "") ? p[4] : "#projects";
+    var external = url !== "#projects" ? ' target="_blank" rel="noopener noreferrer"' : "";
+    return '<a class="proj" href="' + esc(url) + '"' + external + ">" + thumb + "<h2>" + esc(p[0]) + "</h2><p>" + esc(p[1]) + "</p></a>";
   }).join("");
 
   PH = (D.photos || []).filter(function (p) { return p && p.src; }).map(function (p) { return [p.src, 220]; });

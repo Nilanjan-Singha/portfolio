@@ -43,10 +43,6 @@
       {
         "k": "Focus",
         "v": "Webapp Development, AI/ML Integration"
-      },
-      {
-        "k": "Say hello",
-        "v": "nilanjansingh29@gmail.com"
       }
     ]
   },
@@ -227,24 +223,28 @@
     {
       "t": "Ledgerline",
       "x": "A calm invoicing tool for freelancers, from first sketch to 4,000 paying users.",
+      "url": "",
       "c1": "#dfe8cf",
       "c2": "#b8cf94"
     },
     {
       "t": "Crit",
       "x": "A product design health check for small teams. Fast feedback, clear outcomes.",
+      "url": "",
       "c1": "#ececea",
       "c2": "#cfcfca"
     },
     {
       "t": "Tokenbox",
       "x": "A design token manager that keeps Figma and code in sync.",
+      "url": "",
       "c1": "#d5dfc2",
       "c2": "#8fae5c"
     },
     {
       "t": "Typefast",
       "x": "A tiny typing trainer I built over a long weekend.",
+      "url": "",
       "c1": "#f1efe9",
       "c2": "#d9d5c8"
     }

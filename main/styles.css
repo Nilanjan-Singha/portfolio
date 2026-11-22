@@ -767,6 +767,11 @@ a.btn {
   display: flex;
   transition: transform 0.35s ease;
 }
+.list-footer {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+}
 .slide {
   flex: 0 0 100%;
   min-width: 0;

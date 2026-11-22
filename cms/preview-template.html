@@ -189,6 +189,7 @@ a.btn{display:inline-block}
 .photos .ph{aspect-ratio:4/3}
 .empty{column-span:all;text-align:center;color:var(--mute);padding:72px 0 56px;margin:0;font-size:14px}
 .empty b{display:block;color:var(--ink);font-size:17px;font-weight:600;margin-bottom:6px}
+.empty span{display:block;color:var(--mute)}
 footer{background:var(--bg);border-top:1px solid var(--line)}
 footer .wrap{display:flex;align-items:center;justify-content:space-between;padding-top:40px;padding-bottom:40px;gap:20px;flex-wrap:wrap}
 footer small{color:var(--mute);font-size:12.5px}
@@ -341,12 +342,12 @@ skillIcons('skills-ai',SK.ai);
 skillIcons('skills-tools',SK.tools);
 })();
 
-document.getElementById('projects').innerHTML=PROJECTS.map(function(p){var u=p[4]||'#projects',ext=u==='#projects'?'':' target="_blank" rel="noopener noreferrer"';return '<a class="proj" href="'+u+'"'+ext+'>'+ (p[3]?'<div class="thumb im"><img src="'+p[3]+'" alt=""></div>':'<div class="thumb" style="--g:'+p[2]+'"></div>')+'<h2>'+p[0]+'</h2><p>'+p[1]+'</p></a>'}).join('');
+document.getElementById('projects').innerHTML=PROJECTS.length?PROJECTS.map(function(p){var u=p[4]||'#projects',ext=u==='#projects'?'':' target="_blank" rel="noopener noreferrer"';return '<a class="proj" href="'+u+'"'+ext+'>'+ (p[3]?'<div class="thumb im"><img src="'+p[3]+'" alt=""></div>':'<div class="thumb" style="--g:'+p[2]+'"></div>')+'<h2>'+p[0]+'</h2><p>'+p[1]+'</p></a>'}).join(''):'<div class="empty"><b>No projects found</b><span>Add projects in the CMS and they will appear here.</span></div>';
 var pe=document.getElementById('photos');
 pe.innerHTML=PH.length?PH.map(function(p){return '<img src="'+p[0]+'" alt="'+p[1]+'" loading="lazy">'}).join(''):'<p class="empty"><b>No photos in your gallery yet</b>Photos you add will show up here.</p>';
 [].forEach.call(pe.querySelectorAll('img'),function(i){i.onerror=function(){var d=document.createElement('div');d.className='ph';d.style.background=soft(i.alt||i.src.slice(-12))[0];i.replaceWith(d)}});
 function meta(p){return '<div class="meta"><span>'+p.d+'</span><span aria-hidden="true">•</span>'+p.tags.map(function(t){return '<span class="t">#'+t+'</span>'}).join('')+'</div>'}
-document.getElementById('list').innerHTML=POSTS.map(function(p){return '<article class="post">'+meta(p)+'<h2><a href="#'+p.id+'">'+p.t+'</a></h2><p>'+p.x+'</p></article>'}).join('');
+document.getElementById('list').innerHTML=POSTS.length?POSTS.map(function(p){return '<article class="post">'+meta(p)+'<h2><a href="#'+p.id+'">'+p.t+'</a></h2><p>'+p.x+'</p></article>'}).join(''):'<div class="empty"><b>No writing found</b><span>Add posts in the CMS and they will appear here.</span></div>';
 
 function showPost(p){
   document.getElementById('article').innerHTML='<a class="back" href="#writing">← Back to writing</a><div class="cover" role="img" aria-label="Wireframe sketches"></div>'+meta(p)+'<h1>'+p.t+'</h1>'+p.body.join('')+'<div class="share"><span>Share this article</span><div><button aria-label="Copy link">'+ic('link')+'</button><button aria-label="Share on Twitter">'+ic('twitter')+'</button><button aria-label="Share on Dribbble">'+ic('dribbble')+'</button><button aria-label="Share on LinkedIn">'+ic('linkedin')+'</button></div></div>';

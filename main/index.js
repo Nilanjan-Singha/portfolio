@@ -385,14 +385,16 @@ function applyCms(D) {
   PROJECTS = D.projects.map(function (p) {
     return [p.t, p.x, "linear-gradient(135deg," + (p.c1 || "#dfe8cf") + "," + (p.c2 || "#8fae5c") + ")", p.img || "", p.url || ""];
   });
-  document.getElementById("projects").innerHTML = PROJECTS.map(function (p) {
+  document.getElementById("projects").innerHTML = PROJECTS.length
+    ? PROJECTS.map(function (p) {
     var thumb = p[3]
       ? '<div class="thumb im"><img src="' + p[3].replace(/&/g, "&amp;").replace(/"/g, "&quot;") + '" alt=""></div>'
       : '<div class="thumb" style="background:' + p[2] + '"></div>';
     var url = /^https?:\/\//i.test(p[4] || "") ? p[4] : "#projects";
     var external = url !== "#projects" ? ' target="_blank" rel="noopener noreferrer"' : "";
     return '<a class="proj" href="' + esc(url) + '"' + external + ">" + thumb + "<h2>" + esc(p[0]) + "</h2><p>" + esc(p[1]) + "</p></a>";
-  }).join("");
+  }).join("")
+    : '<div class="empty"><b>No projects found</b><span>Add projects in the CMS and they will appear here.</span></div>';
 
   PH = (D.photos || []).filter(function (p) { return p && p.src; }).map(function (p) { return [p.src, 220]; });
   document.getElementById("photos").innerHTML = PH.length
@@ -400,10 +402,12 @@ function applyCms(D) {
     : '<div class="empty photos-empty"><b>No photos found</b><span>Add photos in the CMS and they will appear here.</span></div>';
 
   POSTS = (D.posts || []).map(cmsPost);
-  document.getElementById("list").innerHTML = POSTS.map(function (p) {
+  document.getElementById("list").innerHTML = POSTS.length
+    ? POSTS.map(function (p) {
     return '<article class="post">' + meta(p) + '<h2><a href="#' +
       p.id + '">' + esc(p.t) + "</a></h2><p>" + esc(p.x) + "</p></article>";
-  }).join("");
+  }).join("")
+    : '<div class="empty"><b>No writing found</b><span>Add posts in the CMS and they will appear here.</span></div>';
 
   LISTS = (D.lists || []).map(function (l) {
     return [

@@ -111,6 +111,11 @@ nav button[aria-current="true"] {
   color: var(--accent);
   border-left-color: var(--accent);
 }
+.portfolio-link {
+  text-align: center;
+  text-decoration: none;
+  margin-top: -12px;
+}
 nav .n {
   font-size: 12px;
   color: var(--mute);

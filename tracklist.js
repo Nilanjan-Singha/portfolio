@@ -1,15 +1,9 @@
 import { LISTS as STATIC_LISTS } from "./main/data.js";
 
-var statusKey = "portfolio-tracklist-status-v1",
-  statuses = ["Want to", "In progress", "Completed", "Paused"],
+var statuses = ["Want to", "In progress", "Completed", "Paused"],
   allItems = [],
   activeCategory = "All",
-  activeStatus = "All",
-  savedStatuses = {};
-
-try {
-  savedStatuses = JSON.parse(localStorage.getItem(statusKey)) || {};
-} catch (e) {}
+  activeStatus = "All";
 
 function esc(value) {
   return String(value == null ? "" : value)
@@ -17,10 +11,6 @@ function esc(value) {
     .replace(/</g, "&lt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
-}
-
-function itemKey(category, title) {
-  return category + "::" + title;
 }
 
 function normalizeLists(data) {
@@ -36,6 +26,7 @@ function normalizeLists(data) {
             item.c2 || "#d9a066",
             item.ink || "#1d2d0b",
             item.img || "",
+            item.status || "Want to",
           ];
         }),
       ];
@@ -65,6 +56,7 @@ function load() {
             accent: item[3],
             ink: item[4],
             image: item[5],
+            status: item[6],
           });
         });
       });
@@ -83,6 +75,7 @@ function load() {
             accent: item[3],
             ink: item[4],
             image: item[5],
+            status: "Want to",
           });
         });
       });
@@ -132,18 +125,17 @@ function updateActiveButtons() {
 function render() {
   var query = document.getElementById("track-search").value.trim().toLowerCase();
   var visible = allItems.filter(function (item) {
-    var key = itemKey(item.category, item.title);
-    var status = savedStatuses[key] || "Want to";
+    var status = item.status || "Want to";
     return (activeCategory === "All" || item.category === activeCategory) &&
       (activeStatus === "All" || status === activeStatus) &&
       (!query || item.title.toLowerCase().indexOf(query) !== -1 ||
         item.creator.toLowerCase().indexOf(query) !== -1);
   });
   var completed = allItems.filter(function (item) {
-    return (savedStatuses[itemKey(item.category, item.title)] || "Want to") === "Completed";
+    return (item.status || "Want to") === "Completed";
   }).length;
   var inProgress = allItems.filter(function (item) {
-    return (savedStatuses[itemKey(item.category, item.title)] || "Want to") === "In progress";
+    return (item.status || "Want to") === "In progress";
   }).length;
   document.getElementById("tracklist-stats").innerHTML =
     "<span>" + allItems.length + " items</span>" +
@@ -152,8 +144,7 @@ function render() {
 
   var grid = document.getElementById("tracklist-grid");
   grid.innerHTML = visible.length ? visible.map(function (item) {
-    var key = itemKey(item.category, item.title);
-    var status = savedStatuses[key] || "Want to";
+    var status = item.status || "Want to";
     var poster = item.image
       ? '<img src="' + esc(item.image) + '" alt="' + esc(item.title) + ' poster">'
       : '<div class="track-poster-fallback"><b>' + esc(item.title) + '</b><small>' + esc(item.creator) + "</small></div>";
@@ -161,26 +152,12 @@ function render() {
       '<article class="track-card">' +
       '<div class="track-poster" style="--c:' + esc(item.color) + ';color:' + esc(item.ink) + '">' +
       poster +
-      '<button class="track-status-tag" type="button" data-key="' + esc(key) + '">' + esc(status) + "</button>" +
+      '<span class="track-status-tag">' + esc(status) + "</span>" +
       "</div>" +
       '<div class="track-meta"><h2>' + esc(item.title) + "</h2>" +
       '<p>' + esc(item.category) + " · " + esc(item.creator) + "</p></div></article>"
     );
   }).join("") : '<div class="track-empty">No items match these filters.</div>';
-
-  Array.prototype.forEach.call(grid.querySelectorAll(".track-status-tag"), function (button) {
-    button.addEventListener("click", function (event) {
-      event.stopPropagation();
-      var key = button.getAttribute("data-key");
-      var current = savedStatuses[key] || "Want to";
-      var next = statuses[(statuses.indexOf(current) + 1) % statuses.length];
-      savedStatuses[key] = next;
-      try {
-        localStorage.setItem(statusKey, JSON.stringify(savedStatuses));
-      } catch (e) {}
-      render();
-    });
-  });
 
 }
 

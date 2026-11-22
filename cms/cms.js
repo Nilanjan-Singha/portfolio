@@ -35,7 +35,7 @@ var SC=[
  {k:'tools',l:'Tools & platforms (icon names)',t:'strings',a:'Add tool'}]},
 {l:'Lists',d:'Shelves for reading, watching and gaming. Each item becomes a book spine. Add a cover image, or leave it empty for an automatic soft color.',c:function(){return D.lists.length},o:function(){return D},f:[
  {k:'lists',l:'Shelves',t:'list',sum:'name',a:'Add shelf',n:{name:'New shelf',items:[]},f:[{k:'name',l:'Shelf name'},
-  {k:'items',l:'Items (ranked in order)',t:'list',inline:1,a:'Add item',n:{t:'',s:'',img:''},f:[{k:'t',l:'Title'},{k:'s',l:'Author or studio'},{k:'img',l:'Cover image',t:'img',w:420,wide:1}]}]}]},
+  {k:'items',l:'Items (ranked in order)',t:'list',inline:1,a:'Add item',n:{t:'',s:'',status:'Want to',img:''},f:[{k:'t',l:'Title'},{k:'s',l:'Author or studio'},{k:'status',l:'Status',t:'select',half:1,options:['Want to','In progress','Completed','Paused']},{k:'img',l:'Cover image',t:'img',w:420,wide:1}]}]}]},
 {l:'Writing',d:'Blog posts. Separate paragraphs with a blank line and start a line with ## for a heading. The first paragraph becomes the lead.',c:function(){return D.posts.length},o:function(){return D},f:[
  {k:'posts',l:'Posts',t:'list',sum:'t',top:1,a:'New post',n:function(){return {t:'Untitled post',d:new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}),tags:'',x:'',body:''}},f:[{k:'t',l:'Title'},{k:'d',l:'Date',half:1},{k:'tags',l:'Tags (comma separated)',half:1},{k:'x',l:'Excerpt',t:'area',r:2},{k:'body',l:'Article',t:'area',r:12}]}]},
 {l:'Projects',d:'Project cards. Add an image and URL, or leave them empty for an automatic card.',c:function(){return D.projects.length},o:function(){return D},f:[
@@ -66,9 +66,12 @@ function ctl(arr,n,draw){var w=el('span','ctl');[['↑','Move up'],['↓','Move 
 function fields(fs,o,inl){var w=el('div','fields'+(inl?' inl':''));fs.forEach(function(f){w.appendChild(fld(f,o))});return w}
 function fld(f,o){var t=f.t||'text';
  if(t==='list')return lst(f,o[f.k]);if(t==='strings')return strs(f,o[f.k]);if(t==='img')return img(f,o);
- var w=el('label','f'+(f.half?'':' full')),i=el(t==='area'?'textarea':'input');w.appendChild(el('span','l',f.l));
- if(t==='area')i.rows=f.r||3;else i.type=t==='color'?'color':t==='num'?'number':'text';
- i.value=o[f.k]==null?'':o[f.k];i.oninput=function(){o[f.k]=t==='num'?+i.value:i.value;chg()};
+ var w=el('label','f'+(f.half?'':' full')),i=el(t==='area'?'textarea':t==='select'?'select':'input');w.appendChild(el('span','l',f.l));
+ if(t==='area')i.rows=f.r||3;
+ else if(t==='select'){(f.options||[]).forEach(function(option){var selected=el('option','',option);selected.value=option;i.appendChild(selected)})}
+ else i.type=t==='color'?'color':t==='num'?'number':'text';
+ i.value=o[f.k]==null?'Want to':o[f.k];
+ i[t==='select'?'onchange':'oninput']=function(){o[f.k]=t==='num'?+i.value:i.value;chg()};
  w.appendChild(i);return w}
 
 function lst(f,arr){var box=el('div','lst'),lh=el('div','lh','<span class="l">'+f.l+'</span>'),cnt=el('span','l'),items=el('div','items'),add=el('button','add','+ '+(f.a||'Add item'));add.type='button';lh.appendChild(cnt);

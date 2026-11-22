@@ -523,6 +523,15 @@ main {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 48px 40px;
 }
+.grid > .empty,
+#list > .empty,
+.photos > .empty {
+  grid-column: 1 / -1;
+  width: 100%;
+  text-align: center;
+  justify-self: center;
+  align-self: center;
+}
 .proj .thumb {
   aspect-ratio: 4/3;
   border-radius: 10px;
